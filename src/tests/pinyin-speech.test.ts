@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { scoreVoice } from '@/domain/speech';
 import { buildSpeechCues } from '@/domain/speech';
 import { toChinesePinyinSpeech } from '@/domain/pinyin-speech';
 
@@ -32,5 +33,24 @@ describe('Chinese pinyin speech', () => {
     expect(cues.map((cue) => cue.text)).toEqual(['A', 'B', 'C']);
     expect(cues.every((cue) => cue.pauseBeforeMs >= 200)).toBe(true);
     expect(cues.every((cue) => cue.pauseAfterMs >= 400)).toBe(true);
+  });
+
+  it('prefers the installed high-quality Yue voice for children', () => {
+    const yue = {
+      default: false,
+      lang: 'zh-CN',
+      localService: true,
+      name: 'Yue (Premium)',
+      voiceURI: 'Yue (Premium)',
+    } as SpeechSynthesisVoice;
+    const tingting = {
+      default: false,
+      lang: 'zh-CN',
+      localService: true,
+      name: 'Tingting (中文（中国大陆）)',
+      voiceURI: 'Tingting',
+    } as SpeechSynthesisVoice;
+
+    expect(scoreVoice(yue, 'zh-CN')).toBeGreaterThan(scoreVoice(tingting, 'zh-CN'));
   });
 });

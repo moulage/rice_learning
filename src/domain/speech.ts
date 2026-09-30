@@ -8,6 +8,8 @@ export interface VoiceOption {
 }
 
 const preferredPatterns: Array<{ pattern: RegExp; score: number; label?: string }> = [
+  { pattern: /(^|[^a-z])yue(?![a-z])|月（高音质）|月\s*[(（]?(高音质|premium)?/i, score: 1200, label: '月 · 高音质老师音' },
+  { pattern: /lilian?\s*[(（]?\s*premium/i, score: 1080, label: '莉莉/黎潋 · 高音质' },
   { pattern: /xiaoxiao|xiao[- ]?xiao/i, score: 1000, label: '晓晓 · 自然女老师音' },
   { pattern: /yunxi|xiao[- ]?yi/i, score: 960, label: '云希/小艺 · 自然老师音' },
   { pattern: /yunyang/i, score: 940, label: '云扬 · 播音老师音' },
