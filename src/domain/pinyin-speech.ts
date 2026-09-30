@@ -110,20 +110,21 @@ function replaceAccentedToken(token: string): string {
   const tone = toneMark ? ['\u0304', '\u0301', '\u030c', '\u0300'].indexOf(toneMark) + 1 : null;
   const toneWord = tone ? toneNames[tone - 1] : '';
   const toneSpecific = toneSpecificSyllables.get(`${base}${tone ?? ''}`);
-  if (toneSpecific) return toneSpecific;
+  if (toneSpecific) return `${toneSpecific}，`;
 
   const baseWord = syllables.get(base);
   if (!baseWord) return token;
-  return tone ? `${baseWord}${toneWord}` : baseWord;
+  return tone ? `${baseWord}${toneWord}，` : `${baseWord}，`;
 }
 
 function replacePlainToken(token: string): string {
   const lower = token.toLowerCase();
-  return syllables.get(lower)
+  const replacement = syllables.get(lower)
     ?? initials.find(([key]) => key === lower)?.[1]
     ?? finals.find(([key]) => key === lower)?.[1]
     ?? singleLetters.get(lower)
     ?? token;
+  return replacement === token ? token : `${replacement}，`;
 }
 
 export function toChinesePinyinSpeech(text: string): string {
@@ -132,5 +133,6 @@ export function toChinesePinyinSpeech(text: string): string {
       if (!/[\u0304\u0301\u030c\u0300]/.test(token.normalize('NFD'))) return token;
       return replaceAccentedToken(token);
     })
-    .replace(pinyinTokenPattern, (token) => replacePlainToken(token));
+    .replace(pinyinTokenPattern, (token) => replacePlainToken(token))
+    .replace(/(?<=[，])\s+/g, '');
 }

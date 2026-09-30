@@ -96,3 +96,100 @@ export function splitSpeechText(text: string): string[] {
     .map((part) => part.trim())
     .filter(Boolean);
 }
+
+export interface SpeechCue {
+  text: string;
+  letter: boolean;
+  pauseBeforeMs: number;
+  pauseAfterMs: number;
+}
+
+function addEnglishLetterPauses(text: string): string {
+  return text.replace(/\b[A-Za-z]\b/g, '$&,');
+}
+
+export function buildSpeechCues(
+  text: string,
+  language: string,
+  letterPauses = false,
+): SpeechCue[] {
+  const normalizedLanguage = normalizeLang(language);
+  const isEnglish = normalizedLanguage.startsWith('en');
+  const prepared = isEnglish && letterPauses ? addEnglishLetterPauses(text) : text;
+
+  return prepared
+    .replace(/\s+/g, ' ')
+    .split(/(?<=[。！？；])/g)
+    .flatMap((part) => part.split(/(?<=[，,])/g))
+    .map((raw) => {
+      const clean = raw.trim().replace(/[，,。！？；]+$/g, '').trim();
+      const ending = raw.trim().slice(-1);
+      const isLetter = letterPauses && (
+        (isEnglish && /^[A-Za-z]$/.test(clean)) ||
+        (!isEnglish && /^[\u4e00-\u9fa5]{1}$/.test(clean))
+      );
+      const pauseBefore = isLetter ? 220 : 0;
+      const pauseAfter = isLetter
+        ? 420
+        : ending === '，' || ending === ','
+          ? 300
+          : ending === '。' || ending === '！' || ending === '？'
+            ? 460
+            : 180;
+      return { text: clean, letter: isLetter, pauseBeforeMs: pauseBefore, pauseAfterMs: pauseAfter };
+    })
+    .filter((cue) => cue.text.length > 0);
+}
+
+let speechSession = 0;
+
+export function cancelSpeech() {
+  speechSession += 1;
+  if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
+}
+
+export interface SpeakTextOptions {
+  text: string;
+  language: string;
+  voice?: SpeechSynthesisVoice;
+  voiceURI?: string;
+  rate: number;
+  pitch: number;
+  volume: number;
+  letterPauses?: boolean;
+}
+
+export function speakText(options: SpeakTextOptions): void {
+  if (typeof speechSynthesis === 'undefined' || !options.text.trim()) return;
+  const session = ++speechSession;
+  const voices = speechSynthesis.getVoices();
+  const selectedVoice = options.voice ?? selectPreferredVoice(voices, options.language, options.voiceURI);
+  const cues = buildSpeechCues(options.text, options.language, options.letterPauses);
+
+  speechSynthesis.cancel();
+
+  const playCue = (index: number) => {
+    if (session !== speechSession || index >= cues.length) return;
+    const cue = cues[index];
+    window.setTimeout(() => {
+      if (session !== speechSession) return;
+      const utterance = new SpeechSynthesisUtterance(cue.text);
+      utterance.lang = selectedVoice?.lang ?? options.language;
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.rate = options.rate;
+      utterance.pitch = options.pitch;
+      utterance.volume = options.volume;
+      utterance.onend = () => {
+        if (session !== speechSession) return;
+        window.setTimeout(() => playCue(index + 1), cue.pauseAfterMs);
+      };
+      utterance.onerror = () => {
+        if (session !== speechSession) return;
+        window.setTimeout(() => playCue(index + 1), cue.pauseAfterMs);
+      };
+      speechSynthesis.speak(utterance);
+    }, cue.pauseBeforeMs);
+  };
+
+  playCue(0);
+}

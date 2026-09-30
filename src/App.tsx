@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getTodayLessons } from './domain/curriculum';
-import { selectPreferredVoice, splitSpeechText } from './domain/speech';
+import { cancelSpeech, speakText } from './domain/speech';
 import { useProgressStore } from './hooks/useProgressStore';
 import { HomePage } from './components/HomePage';
 import { LessonPlayer } from './components/LessonPlayer';
@@ -43,21 +43,14 @@ export default function App() {
   const knowledgeNames = Object.fromEntries(knowledgePoints.map((item) => [item.id, item.name]));
 
   function speak(text: string, language: string) {
-    if (typeof speechSynthesis === 'undefined') return;
-    const selectedVoice = selectPreferredVoice(
-      speechSynthesis.getVoices(),
+    cancelSpeech();
+    speakText({
+      text,
       language,
-      progress.settings.voiceURI,
-    );
-    speechSynthesis.cancel();
-    splitSpeechText(text).forEach((part) => {
-      const utterance = new SpeechSynthesisUtterance(part);
-      utterance.lang = selectedVoice?.lang ?? language;
-      if (selectedVoice) utterance.voice = selectedVoice;
-      utterance.rate = progress.settings.speechRate;
-      utterance.pitch = 1.08;
-      utterance.volume = progress.settings.volume;
-      speechSynthesis.speak(utterance);
+      voiceURI: progress.settings.voiceURI,
+      rate: progress.settings.speechRate,
+      pitch: 1.08,
+      volume: progress.settings.volume,
     });
   }
 

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { selectPreferredVoice, splitSpeechText } from '@/domain/speech';
+import { cancelSpeech, speakText } from '@/domain/speech';
 import { useSpeechVoice } from '@/hooks/useSpeechVoice';
 
 interface SpeakButtonProps {
@@ -16,18 +16,16 @@ export function SpeakButton({ text, speechText, language, rate, volume, voiceURI
   const { voice } = useSpeechVoice(language, voiceURI);
 
   const speak = useCallback(() => {
-    if (typeof speechSynthesis === 'undefined') return;
-    const selectedVoice = voice ?? selectPreferredVoice(speechSynthesis.getVoices(), language, voiceURI);
-    speechSynthesis.cancel();
-
-    splitSpeechText(speechText ?? text).forEach((part) => {
-      const utterance = new SpeechSynthesisUtterance(part);
-      utterance.lang = selectedVoice?.lang ?? language;
-      if (selectedVoice) utterance.voice = selectedVoice;
-      utterance.rate = rate;
-      utterance.pitch = pitch;
-      utterance.volume = volume;
-      speechSynthesis.speak(utterance);
+    cancelSpeech();
+    speakText({
+      text: speechText ?? text,
+      language,
+      voice,
+      voiceURI,
+      rate,
+      pitch,
+      volume,
+      letterPauses: language.startsWith('en') || Boolean(speechText),
     });
   }, [language, pitch, rate, speechText, text, voice, voiceURI, volume]);
 

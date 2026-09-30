@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { AppProgress, Lesson } from '@/domain/types';
 import { subjectProgress } from '@/domain/curriculum';
-import { selectPreferredVoice, splitSpeechText } from '@/domain/speech';
+import { cancelSpeech, speakText } from '@/domain/speech';
 import { useSpeechVoice } from '@/hooks/useSpeechVoice';
 
 interface ParentCenterProps {
@@ -35,17 +35,15 @@ export function ParentCenter({
   const { voice, options } = useSpeechVoice('zh-CN', progress.settings.voiceURI);
 
   function testTeacherVoice() {
-    if (typeof speechSynthesis === 'undefined') return;
-    const selected = voice ?? selectPreferredVoice(speechSynthesis.getVoices(), 'zh-CN', progress.settings.voiceURI);
-    speechSynthesis.cancel();
-    splitSpeechText('你好，小朋友。我们一起走进拼音王国，慢慢读，大胆说。').forEach((part) => {
-      const utterance = new SpeechSynthesisUtterance(part);
-      utterance.lang = selected?.lang ?? 'zh-CN';
-      if (selected) utterance.voice = selected;
-      utterance.rate = progress.settings.speechRate;
-      utterance.pitch = 1.08;
-      utterance.volume = progress.settings.volume;
-      speechSynthesis.speak(utterance);
+    cancelSpeech();
+    speakText({
+      text: '你好，小朋友。我们一起走进拼音王国，慢慢读，大胆说。',
+      language: 'zh-CN',
+      voice,
+      voiceURI: progress.settings.voiceURI,
+      rate: progress.settings.speechRate,
+      pitch: 1.08,
+      volume: progress.settings.volume,
     });
   }
   const masteredCount = Object.values(progress.mastery).filter((item) => item.status === 'mastered').length;
