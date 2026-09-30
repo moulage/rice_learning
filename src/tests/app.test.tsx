@@ -32,6 +32,8 @@ describe('App shell', () => {
 
     await user.click(screen.getAllByRole('button', { name: '进入闯关' })[0]);
     expect(screen.getByRole('button', { name: '回到地图' })).toBeInTheDocument();
+    expect(screen.getByText('教学流程')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '下一步' })).toBeInTheDocument();
   });
 
   it('disables future map entries with a lock state', async () => {

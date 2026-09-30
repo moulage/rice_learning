@@ -985,13 +985,16 @@ function buildLessons(): Lesson[] {
       knowledgeIds: seed.knowledgeIds,
       objectives: seed.objectives,
       estimatedMinutes: 15,
-      segments: [
-        toSegment(seed.id, 'intro', '情境导入', seed.design.stages[0].teacherMove),
-        toSegment(seed.id, 'concept', '学一学', seed.design.stages[1].childAction),
-        toSegment(seed.id, 'practice', '练一练', '完成今天的发音、声调或书写小任务。', tasks.slice(0, 2)),
-        toSegment(seed.id, 'application', '长安任务', seed.design.stages[3].prompt, tasks.slice(2)),
-        toSegment(seed.id, 'summary', '我学会了', seed.design.stages[4].teacherMove),
-      ],
+    segments: [
+      toSegment(seed.id, 'intro', '情境导入', seed.design.stages[0].teacherMove),
+      toSegment(seed.id, 'concept', '学一学', seed.design.stages[1].childAction),
+      toSegment(seed.id, 'practice', '练一练', '完成今天的发音、声调或书写小任务。', tasks.slice(0, 2)),
+      toSegment(seed.id, 'application', '长安任务', seed.design.stages[3].prompt, tasks.slice(2)),
+      toSegment(seed.id, 'summary', '我学会了', seed.design.stages[4].teacherMove),
+    ].map((segment) => ({
+      ...segment,
+      teachingFlow: seed.teachingFlow?.filter(step => step.segmentId === segment.id),
+    })),
       reviewIntervalDays: [1, 3, 7],
       audit: {
         subjectReviewedBy: 'pinyin-specialist',
@@ -999,6 +1002,7 @@ function buildLessons(): Lesson[] {
         status: 'approved',
       },
       lessonDesign: getPinyinDesign(seed),
+      teachingFlow: seed.teachingFlow,
     };
   }
 

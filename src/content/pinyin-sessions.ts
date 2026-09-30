@@ -1,4 +1,4 @@
-import type { InteractionKind, LessonDesign, LessonTask, TaskType, TeachingStage } from '@/domain/types';
+import type { InteractionKind, LessonDesign, LessonTask, TeachingFlowStep, TaskType, TeachingStage } from '@/domain/types';
 
 interface PinyinTaskSeed {
   type: TaskType;
@@ -20,7 +20,44 @@ export interface PinyinSessionSeed {
   objectives: string[];
   drills: [PinyinTaskSeed, PinyinTaskSeed, PinyinTaskSeed];
   design: LessonDesign;
+  teachingFlow?: TeachingFlowStep[];
 }
+
+const week1TeachingFlow: TeachingFlowStep[] = [
+  { id: 'W01-D1-S01', segmentId: 'PINYIN-W01-D1-intro', slide: 1, phase: '导入', title: '走进拼音王国', durationMinutes: 2, teacherScript: '今天老师要带小朋友走进拼音王国，认识三位新朋友。', childAction: '坐好，看大屏幕，说出画面上有什么。', keyPoint: '用神秘感和情境吸引注意。', interaction: 'listen', visual: 'PPT封面：a o e 和拼音王国' },
+  { id: 'W01-D1-S02', segmentId: 'PINYIN-W01-D1-concept', slide: 2, phase: '新授', title: '拼音村的歌声', durationMinutes: 4, teacherScript: '听，拼音村里传来三种声音：医生看嗓子、公鸡打鸣、白鹅水中照影。', childAction: '听声音，模仿医生、公鸡和白鹅。', keyPoint: '把声音与生活形象联系起来。', interaction: 'listen', visual: 'PPT第2页：三种生活情境' },
+  { id: 'W01-D1-S03', segmentId: 'PINYIN-W01-D1-concept', slide: 3, phase: '新授', title: '认识单韵母大家庭', durationMinutes: 4, teacherScript: '单韵母一家有6个宝宝，今天先认识 a、o、e。', childAction: '看卡片，指一指今天要学的三个宝宝。', keyPoint: '知道单韵母口型不变，声音响亮拉长。', interaction: 'choose', visual: 'PPT第3页：6个单韵母对比' },
+  { id: 'W01-D1-S04', segmentId: 'PINYIN-W01-D1-practice', slide: 2, phase: '练习', title: '听声音选宝宝', durationMinutes: 3, teacherScript: '我读一个声音，你马上指出对应的拼音宝宝。', childAction: '完成听音选图，说出选择的理由。', keyPoint: '能听辨 a、o、e。', interaction: 'choose', visual: '情境声音卡片' },
+  { id: 'W01-D1-S05', segmentId: 'PINYIN-W01-D1-application', slide: 3, phase: '练习', title: '小镜子口型游戏', durationMinutes: 3, teacherScript: '拿小镜子照一照，看看你的嘴巴像不像拼音宝宝。', childAction: '照镜子模仿 a、o、e 的口型。', keyPoint: '发音时口型保持不变。', interaction: 'mirror', visual: '口型对照镜' },
+  { id: 'W01-D1-S06', segmentId: 'PINYIN-W01-D1-summary', slide: 3, phase: '小结', title: '今天认识谁', durationMinutes: 2, teacherScript: '谁能说一说，今天认识了哪三位新朋友？', childAction: '说出 a、o、e，并做一个口型。', keyPoint: '能复述今天学习内容。', interaction: 'review', visual: 'a o e 总结卡' },
+  { id: 'W01-D2-S01', segmentId: 'PINYIN-W01-D2-intro', slide: 3, phase: '导入', title: '召回拼音宝宝', durationMinutes: 2, teacherScript: '昨天认识的三位拼音宝宝又来了，我们一起读一读。', childAction: '看卡片，快速认读 a、o、e。', keyPoint: '巩固上一课发音。', interaction: 'review', visual: 'a o e 卡片' },
+  { id: 'W01-D2-S02', segmentId: 'PINYIN-W01-D2-concept', slide: 4, phase: '新授', title: '拼音字母的家', durationMinutes: 3, teacherScript: '拼音字母住在四线三格里，数一数有几条线、几层楼。', childAction: '指出上格、中格、下格。', keyPoint: '知道 a、o、e 都住中格。', interaction: 'choose', visual: 'PPT第4页：四线三格' },
+  { id: 'W01-D2-S03', segmentId: 'PINYIN-W01-D2-concept', slide: 5, phase: '示范', title: '学发 a', durationMinutes: 4, teacherScript: '张大嘴巴，舌头放平，跟我读：a——', childAction: '照口型模仿，声音响亮拉长。', keyPoint: '嘴巴张大，舌头放平。', interaction: 'speak', visual: 'PPT第5页：a 的口型' },
+  { id: 'W01-D2-S04', segmentId: 'PINYIN-W01-D2-concept', slide: 6, phase: '新授', title: 'a 的四顶小帽子', durationMinutes: 4, teacherScript: 'a 有四顶小帽子，我们边做手势边读。', childAction: '读 ā á ǎ à，并做出平、扬、拐弯、降的手势。', keyPoint: '一声平，二声扬，三声拐弯，四声降。', interaction: 'gesture', visual: 'PPT第6页：a 的四声' },
+  { id: 'W01-D2-S05', segmentId: 'PINYIN-W01-D2-practice', slide: 6, phase: '练习', title: '听音举卡', durationMinutes: 3, teacherScript: '我读 a 的一个声调，你马上找卡片。', childAction: '听音选卡，并说出调号方向。', keyPoint: '能听辨 a 的四个声调。', interaction: 'game', visual: 'ā á ǎ à 卡片' },
+  { id: 'W01-D2-S06', segmentId: 'PINYIN-W01-D2-application', slide: 5, phase: '练习', title: '小镜子读 a', durationMinutes: 2, teacherScript: '照镜子检查嘴巴有没有张大。', childAction: '照镜子读 a，保持口型。', keyPoint: '口型稳定。', interaction: 'mirror', visual: '小镜子' },
+  { id: 'W01-D2-S07', segmentId: 'PINYIN-W01-D2-summary', slide: 6, phase: '小结', title: 'a 的口诀', durationMinutes: 2, teacherScript: '我们一起说：张大嘴巴 a a a。', childAction: '说口诀并做手势。', keyPoint: '巩固 a 的发音和四声。', interaction: 'review', visual: 'a 四声板书' },
+  { id: 'W01-D3-S01', segmentId: 'PINYIN-W01-D3-intro', slide: 6, phase: '导入', title: '复习 a', durationMinutes: 2, teacherScript: '我们先请 a 出来，带四顶小帽子读一读。', childAction: '认读 ā á ǎ à。', keyPoint: '复习 a 的声调。', interaction: 'review', visual: 'ā á ǎ à 卡片' },
+  { id: 'W01-D3-S02', segmentId: 'PINYIN-W01-D3-concept', slide: 7, phase: '示范', title: '书写 a', durationMinutes: 5, teacherScript: 'a 两笔写成：先左半圆，再竖右弯，写满中格。', childAction: '先书空，再在四线三格描一描。', keyPoint: 'a 写满中格，不越线。', interaction: 'trace', visual: 'PPT第7页：a 的笔顺' },
+  { id: 'W01-D3-S03', segmentId: 'PINYIN-W01-D3-concept', slide: 8, phase: '新授', title: '学发 o', durationMinutes: 4, teacherScript: '嘴巴拢圆，舌头后缩，跟我读：o——', childAction: '保持圆唇，声音不断。', keyPoint: 'o 的口型不变。', interaction: 'speak', visual: 'PPT第8页：o 的口型' },
+  { id: 'W01-D3-S04', segmentId: 'PINYIN-W01-D3-concept', slide: 9, phase: '新授', title: 'o 的四声', durationMinutes: 4, teacherScript: 'o 也有四顶小帽子，看清方向再读。', childAction: '读 ō ó ǒ ò，并做手势。', keyPoint: '读准 o 的四个声调。', interaction: 'gesture', visual: 'PPT第9页：o 的四声' },
+  { id: 'W01-D3-S05', segmentId: 'PINYIN-W01-D3-practice', slide: 8, phase: '练习', title: 'a o 比一比', durationMinutes: 3, teacherScript: '听一听，老师说的是 a 还是 o。', childAction: '听音选卡，说说嘴巴变化。', keyPoint: '区分张大嘴和圆嘴。', interaction: 'game', visual: 'a o 对比卡' },
+  { id: 'W01-D3-S06', segmentId: 'PINYIN-W01-D3-application', slide: 8, phase: '练习', title: '小镜子读 o', durationMinutes: 2, teacherScript: '照镜子看看嘴巴是不是圆圆的。', childAction: '照镜子读 o。', keyPoint: '圆唇保持。', interaction: 'mirror', visual: '小镜子' },
+  { id: 'W01-D3-S07', segmentId: 'PINYIN-W01-D3-summary', slide: 9, phase: '小结', title: 'a o 小结', durationMinutes: 2, teacherScript: '张大嘴巴 a，嘴巴圆圆 o。', childAction: '复述口诀。', keyPoint: '巩固 a o。', interaction: 'review', visual: 'a o 板书' },
+  { id: 'W01-D4-S01', segmentId: 'PINYIN-W01-D4-intro', slide: 9, phase: '导入', title: '复习 o', durationMinutes: 2, teacherScript: 'o 又来了，带上四顶小帽子读一读。', childAction: '认读 ō ó ǒ ò。', keyPoint: '复习 o 的声调。', interaction: 'review', visual: 'ō ó ǒ ò 卡片' },
+  { id: 'W01-D4-S02', segmentId: 'PINYIN-W01-D4-concept', slide: 10, phase: '示范', title: '书写 o', durationMinutes: 4, teacherScript: 'o 一笔写成，从左上起笔转一圈回到起笔处。', childAction: '书空后在四线三格描画。', keyPoint: '写圆、合拢、住中格。', interaction: 'trace', visual: 'PPT第10页：o 的笔顺' },
+  { id: 'W01-D4-S03', segmentId: 'PINYIN-W01-D4-concept', slide: 11, phase: '新授', title: '学发 e', durationMinutes: 4, teacherScript: '嘴角向两边咧，嘴巴扁扁，跟我读：e——', childAction: '看白鹅倒影图，模仿 e 的口型。', keyPoint: '嘴角展开，舌头后缩。', interaction: 'speak', visual: 'PPT第11页：白鹅倒影' },
+  { id: 'W01-D4-S04', segmentId: 'PINYIN-W01-D4-concept', slide: 12, phase: '新授', title: 'e 的四声', durationMinutes: 4, teacherScript: 'e 也有四顶小帽子，我们边做手势边读。', childAction: '读 ē é ě è。', keyPoint: '读准 e 的四个声调。', interaction: 'gesture', visual: 'PPT第12页：e 的四声' },
+  { id: 'W01-D4-S05', segmentId: 'PINYIN-W01-D4-practice', slide: 11, phase: '练习', title: 'o e 比一比', durationMinutes: 3, teacherScript: '听一听，老师说的是圆嘴 o 还是扁嘴 e。', childAction: '听音选卡并说理由。', keyPoint: '区分 o 和 e。', interaction: 'game', visual: 'o e 对比卡' },
+  { id: 'W01-D4-S06', segmentId: 'PINYIN-W01-D4-application', slide: 11, phase: '练习', title: '小镜子读 e', durationMinutes: 2, teacherScript: '照镜子检查嘴角有没有展开。', childAction: '照镜子读 e。', keyPoint: '扁唇保持。', interaction: 'mirror', visual: '小镜子' },
+  { id: 'W01-D4-S07', segmentId: 'PINYIN-W01-D4-summary', slide: 12, phase: '小结', title: 'o e 小结', durationMinutes: 2, teacherScript: '嘴巴圆圆 o，扁扁嘴巴 e。', childAction: '复述口诀。', keyPoint: '巩固 o e。', interaction: 'review', visual: 'o e 板书' },
+  { id: 'W01-D5-S01', segmentId: 'PINYIN-W01-D5-intro', slide: 13, phase: '导入', title: '复习 a o e', durationMinutes: 2, teacherScript: '三个拼音宝宝要检查昨天学的本领。', childAction: '快速认读 a、o、e。', keyPoint: '巩固字母认读。', interaction: 'review', visual: 'a o e 卡片' },
+  { id: 'W01-D5-S02', segmentId: 'PINYIN-W01-D5-concept', slide: 13, phase: '示范', title: '书写 e', durationMinutes: 4, teacherScript: 'e 先写短横，再向上向左弯成半圆。', childAction: '书空后在四线三格描画。', keyPoint: '一笔写成，写满中格。', interaction: 'trace', visual: 'PPT第13页：e 的笔顺' },
+  { id: 'W01-D5-S03', segmentId: 'PINYIN-W01-D5-practice', slide: 14, phase: '练习', title: '闯关游戏：听音指卡', durationMinutes: 4, teacherScript: '我读一个音，你马上指出 a、o、e。', childAction: '完成听音指卡，升级玩法带声调。', keyPoint: '能听辨字母和声调。', interaction: 'game', visual: 'PPT第14页：听音指卡' },
+  { id: 'W01-D5-S04', segmentId: 'PINYIN-W01-D5-application', slide: 15, phase: '辨错', title: '火眼金睛找错误', durationMinutes: 3, teacherScript: '出示口型、调号和占格例，请你当小老师。', childAction: '判断对错，说出哪里要改。', keyPoint: '发现口型、调号、占格错误。', interaction: 'choose', visual: 'PPT第15页：常见错误辨析' },
+  { id: 'W01-D5-S05', segmentId: 'PINYIN-W01-D5-summary', slide: 16, phase: '小结', title: '今天我学会了', durationMinutes: 2, teacherScript: '我们一起总结口诀和课后小任务。', childAction: '说收获，领课后任务。', keyPoint: '复习 a o e 和四声口诀。', interaction: 'review', visual: 'PPT第16页：课堂小结' },
+  { id: 'W01-D5-S06', segmentId: 'PINYIN-W01-D5-summary', slide: 16, phase: '小结', title: '课后小任务', durationMinutes: 1, teacherScript: '回家当小老师，把今天学的拼音读给爸爸妈妈。', childAction: '记住三个课后任务。', keyPoint: '能向家长展示学习成果。', interaction: 'speak', visual: '课后任务卡' },
+];
 
 function task(seed: PinyinTaskSeed, index: number): LessonTask {
   return {
@@ -412,6 +449,7 @@ export const pinyinSessionSeeds: PinyinSessionSeed[] = [
       { type: 'tracing', prompt: index === 0 ? '用手指画出今天的拼音朋友。' : `在四线三格里描画今天的拼音。`, hint: index === 0 ? '慢慢画。' : '写满中格，不出格。', coaching: index === 0 ? '你完成了拼音画。' : '你的占格越来越准。', knowledgeId: 'PINYIN-VOWEL-A' },
     ] as [PinyinTaskSeed, PinyinTaskSeed, PinyinTaskSeed],
     design,
+    teachingFlow: week1TeachingFlow.filter((step) => step.id.startsWith(`W01-D${index + 1}-`)),
   })),
   ...laterSessions.map((seed, index) => {
     const order = index + 5;

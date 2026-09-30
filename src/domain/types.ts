@@ -38,6 +38,7 @@ export interface LessonSegment {
   title: string;
   script: string;
   tasks?: LessonTask[];
+  teachingFlow?: TeachingFlowStep[];
 }
 
 export type InteractionKind =
@@ -78,6 +79,20 @@ export interface LessonDesign {
   reflectionQuestions: string[];
 }
 
+export interface TeachingFlowStep {
+  id: string;
+  segmentId: LessonSegment['id'] | LessonSegment['type'];
+  slide: number;
+  phase: '导入' | '新授' | '示范' | '练习' | '辨错' | '小结';
+  title: string;
+  durationMinutes: number;
+  teacherScript: string;
+  childAction: string;
+  keyPoint: string;
+  interaction: InteractionKind;
+  visual: string;
+}
+
 export interface Lesson {
   id: string;
   week: number;
@@ -98,6 +113,7 @@ export interface Lesson {
     status: AuditStatus;
   };
   lessonDesign?: LessonDesign;
+  teachingFlow?: TeachingFlowStep[];
 }
 
 export interface KnowledgePoint {

@@ -33,15 +33,24 @@ export function LessonPlayer({
   const segment = lesson.segments[segmentIndex];
   const tasks = segment.tasks ?? [];
   const [taskIndex, setTaskIndex] = useState(0);
+  const [flowIndex, setFlowIndex] = useState(0);
   const [showRest, setShowRest] = useState(false);
   const language = lesson.subject === 'english' ? 'en-US' : 'zh-CN';
   const task = tasks[taskIndex];
   const isLastSegment = segmentIndex === lesson.segments.length - 1;
   const designStage = lesson.lessonDesign?.stages[segmentIndex];
-  const speechText = lesson.subject === 'pinyin' ? toChinesePinyinSpeech(segment.script) : undefined;
+  const flowSteps = segment.teachingFlow ?? [];
+  const flowStep = flowSteps[flowIndex];
+  const isLastFlow = !flowSteps.length || flowIndex >= flowSteps.length - 1;
+  const showTask = isLastFlow;
+  const activeScript = flowStep?.teacherScript ?? segment.script;
+  const speechText = lesson.subject === 'pinyin'
+    ? toChinesePinyinSpeech(activeScript)
+    : undefined;
 
   useEffect(() => {
     setTaskIndex(0);
+    setFlowIndex(0);
   }, [segment.id]);
 
   useEffect(() => {
@@ -104,7 +113,7 @@ export function LessonPlayer({
         <div className="segment-head">
           <span className={`subject-badge ${lesson.subject}`}>{segment.title}</span>
           <SpeakButton
-            text={segment.script}
+            text={activeScript}
             speechText={speechText}
             language={language}
             rate={progress.settings.speechRate}
@@ -112,7 +121,67 @@ export function LessonPlayer({
             voiceURI={progress.settings.voiceURI}
           />
         </div>
-        <p className="segment-script">{segment.script}</p>
+        {flowSteps.length > 0 && (
+          <div className="teaching-flow" aria-label="本环节教学流程">
+            <div className="flow-head">
+              <strong>教学流程</strong>
+              <span>{flowIndex + 1} / {flowSteps.length}</span>
+            </div>
+            <ol className="flow-list">
+              {flowSteps.map((step, index) => (
+                <li key={step.id}>
+                  <button
+                    type="button"
+                    className={index === flowIndex ? 'active' : ''}
+                    onClick={() => setFlowIndex(index)}
+                  >
+                    <span>PPT {step.slide}</span>
+                    <strong>{step.title}</strong>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {flowStep ? (
+          <article className="flow-stage" aria-label={`PPT第${flowStep.slide}页教学流程`}>
+            <div className="flow-meta">
+              <span className="flow-slide">PPT {flowStep.slide}</span>
+              <span className="flow-phase">{flowStep.phase}</span>
+              <span>{flowStep.durationMinutes} 分钟</span>
+              <span>{flowStep.interaction}</span>
+            </div>
+            <h3>{flowStep.title}</h3>
+            <p className="flow-teacher">{flowStep.teacherScript}</p>
+            <div className="flow-child">
+              <strong>孩子这样做</strong>
+              <p>{flowStep.childAction}</p>
+            </div>
+            <div className="flow-key">
+              <strong>关键点</strong>
+              <p>{flowStep.keyPoint}</p>
+            </div>
+            <p className="flow-visual">画面提示：{flowStep.visual}</p>
+            <div className="task-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                disabled={flowIndex === 0}
+                onClick={() => setFlowIndex(current => Math.max(0, current - 1))}
+              >
+                上一步
+              </button>
+              {!isLastFlow && (
+                <button type="button" className="primary-button" onClick={() => setFlowIndex(current => current + 1)}>
+                  完成这一页
+                </button>
+              )}
+            </div>
+          </article>
+        ) : (
+          <p className="segment-script">{segment.script}</p>
+        )}
 
         {designStage && (
           <div className="teaching-stage" aria-label="当前教学环节">
@@ -149,7 +218,7 @@ export function LessonPlayer({
           </details>
         )}
 
-        {task ? (
+        {showTask && task ? (
           <TaskRenderer
             key={task.id}
             task={task}
@@ -157,7 +226,7 @@ export function LessonPlayer({
             onResult={handleResult}
             onSkip={handleSkip}
           />
-        ) : (
+        ) : showTask ? (
           <div className="task-actions center">
             {isLastSegment ? (
               <button type="button" className="primary-button" onClick={onFinish}>完成课程</button>
@@ -165,9 +234,9 @@ export function LessonPlayer({
               <button type="button" className="primary-button" onClick={onAdvance}>下一步</button>
             )}
           </div>
-        )}
+        ) : null}
 
-        {!task && tasks.length > 0 && (
+        {!flowStep && tasks.length > 0 && (
           <div className="task-actions center">
             <button type="button" className="primary-button" onClick={() => setTaskIndex(0)}>开始练习</button>
           </div>
