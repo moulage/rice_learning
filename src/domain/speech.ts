@@ -130,9 +130,9 @@ export function buildSpeechCues(
         (isEnglish && /^[A-Za-z]$/.test(clean)) ||
         (!isEnglish && /^[\u4e00-\u9fa5]{1}$/.test(clean))
       );
-      const pauseBefore = isLetter ? 220 : 0;
+      const pauseBefore = isLetter ? 600 : 0;
       const pauseAfter = isLetter
-        ? 420
+        ? 600
         : ending === '，' || ending === ','
           ? 300
           : ending === '。' || ending === '！' || ending === '？'
@@ -190,7 +190,9 @@ export function speakText(options: SpeakTextOptions): void {
         window.setTimeout(() => playCue(index + 1), cue.pauseAfterMs);
       };
       speechSynthesis.speak(utterance);
-    }, cue.pauseBeforeMs);
+    }, index === 0
+      ? cue.pauseBeforeMs
+      : Math.max(cue.pauseBeforeMs, cues[index - 1].pauseAfterMs));
   };
 
   playCue(0);

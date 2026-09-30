@@ -24,15 +24,15 @@ describe('Chinese pinyin speech', () => {
   it('adds clear pauses around pinyin cues', () => {
     const cues = buildSpeechCues(toChinesePinyinSpeech('a o e'), 'zh-CN', true);
     expect(cues.map((cue) => cue.text)).toEqual(['啊', '喔', '鹅']);
-    expect(cues.every((cue) => cue.pauseBeforeMs >= 200)).toBe(true);
-    expect(cues.every((cue) => cue.pauseAfterMs >= 400)).toBe(true);
+    expect(cues.every((cue) => cue.pauseBeforeMs >= 600)).toBe(true);
+    expect(cues.every((cue) => cue.pauseAfterMs >= 600)).toBe(true);
   });
 
   it('adds clear pauses around English letters', () => {
     const cues = buildSpeechCues('A B C', 'en-US', true);
     expect(cues.map((cue) => cue.text)).toEqual(['A', 'B', 'C']);
-    expect(cues.every((cue) => cue.pauseBeforeMs >= 200)).toBe(true);
-    expect(cues.every((cue) => cue.pauseAfterMs >= 400)).toBe(true);
+    expect(cues.every((cue) => cue.pauseBeforeMs >= 600)).toBe(true);
+    expect(cues.every((cue) => cue.pauseAfterMs >= 600)).toBe(true);
   });
 
   it('prefers the installed high-quality Yue voice for children', () => {
