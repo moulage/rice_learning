@@ -2,6 +2,7 @@ import type { AppProgress, Lesson, SceneInfo } from '@/domain/types';
 import { canStartLesson } from '@/domain/progress';
 import { SpeakButton } from './SpeakButton';
 import { SceneArt } from './SceneArt';
+import { toChinesePinyinSpeech } from '@/domain/pinyin-speech';
 
 interface HomePageProps {
   progress: AppProgress;
@@ -183,6 +184,9 @@ export function HomePage({
           </div>
           <SpeakButton
             text={`今天学习${subjectNames[lesson.subject]}，${lesson.title}。${lesson.objectives[0]}`}
+            speechText={lesson.subject === 'pinyin'
+              ? toChinesePinyinSpeech(`今天学习${subjectNames[lesson.subject]}，${lesson.title}。${lesson.objectives[0]}`)
+              : undefined}
             language={lesson.subject === 'english' ? 'en-US' : 'zh-CN'}
             rate={progress.settings.speechRate}
             volume={progress.settings.volume}

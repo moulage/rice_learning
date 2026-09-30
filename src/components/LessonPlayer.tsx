@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { AppProgress, Lesson } from '@/domain/types';
 import { TaskRenderer } from './TaskRenderer';
 import { SpeakButton } from './SpeakButton';
+import { toChinesePinyinSpeech } from '@/domain/pinyin-speech';
 
 interface LessonPlayerProps {
   lesson: Lesson;
@@ -37,6 +38,7 @@ export function LessonPlayer({
   const task = tasks[taskIndex];
   const isLastSegment = segmentIndex === lesson.segments.length - 1;
   const designStage = lesson.lessonDesign?.stages[segmentIndex];
+  const speechText = lesson.subject === 'pinyin' ? toChinesePinyinSpeech(segment.script) : undefined;
 
   useEffect(() => {
     setTaskIndex(0);
@@ -103,6 +105,7 @@ export function LessonPlayer({
           <span className={`subject-badge ${lesson.subject}`}>{segment.title}</span>
           <SpeakButton
             text={segment.script}
+            speechText={speechText}
             language={language}
             rate={progress.settings.speechRate}
             volume={progress.settings.volume}

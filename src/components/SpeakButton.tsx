@@ -4,6 +4,7 @@ import { useSpeechVoice } from '@/hooks/useSpeechVoice';
 
 interface SpeakButtonProps {
   text: string;
+  speechText?: string;
   language: string;
   rate: number;
   volume: number;
@@ -11,7 +12,7 @@ interface SpeakButtonProps {
   pitch?: number;
 }
 
-export function SpeakButton({ text, language, rate, volume, voiceURI, pitch = 1.08 }: SpeakButtonProps) {
+export function SpeakButton({ text, speechText, language, rate, volume, voiceURI, pitch = 1.08 }: SpeakButtonProps) {
   const { voice } = useSpeechVoice(language, voiceURI);
 
   const speak = useCallback(() => {
@@ -19,7 +20,7 @@ export function SpeakButton({ text, language, rate, volume, voiceURI, pitch = 1.
     const selectedVoice = voice ?? selectPreferredVoice(speechSynthesis.getVoices(), language, voiceURI);
     speechSynthesis.cancel();
 
-    splitSpeechText(text).forEach((part) => {
+    splitSpeechText(speechText ?? text).forEach((part) => {
       const utterance = new SpeechSynthesisUtterance(part);
       utterance.lang = selectedVoice?.lang ?? language;
       if (selectedVoice) utterance.voice = selectedVoice;
@@ -28,7 +29,7 @@ export function SpeakButton({ text, language, rate, volume, voiceURI, pitch = 1.
       utterance.volume = volume;
       speechSynthesis.speak(utterance);
     });
-  }, [language, pitch, rate, text, voice, voiceURI, volume]);
+  }, [language, pitch, rate, speechText, text, voice, voiceURI, volume]);
 
   return (
     <button type="button" className="icon-button" onClick={speak} aria-label={`朗读：${text}`}>
