@@ -6,6 +6,7 @@ import type {
   TaskType,
 } from '../domain/types';
 import { scenes } from './scenes';
+import { buildPinyinTasks, getPinyinDesign, pinyinSessionSeeds } from './pinyin-sessions';
 
 interface TaskSeed {
   type?: TaskType;
@@ -829,13 +830,13 @@ const coursePlans: CoursePlan[] = [
   },
 ];
 
-const weekdaySubjects: Array<{ weekday: Lesson['weekday']; subject: Subject }> = [
-  { weekday: 1, subject: 'math' },
-  { weekday: 2, subject: 'pinyin' },
-  { weekday: 3, subject: 'english' },
-  { weekday: 4, subject: 'creation' },
-  { weekday: 5, subject: 'review' },
-];
+interface LessonPlacement {
+  week: number;
+  weekday: Lesson['weekday'];
+  slot: 1 | 2;
+  sourceWeek: number;
+  subject: Subject;
+}
 
 function toTask(
   lessonId: string,
@@ -903,7 +904,8 @@ function objectivesFor(subject: Subject, sceneName: string, source: TopicSeed): 
   return source.objectives;
 }
 
-function toLesson(plan: CoursePlan, weekday: Lesson['weekday'], subject: Subject): Lesson {
+function toLesson(plan: CoursePlan, placement: LessonPlacement): Lesson {
+  const { weekday, subject, sourceWeek } = placement;
   const scene = scenes[(plan.week - 1) % scenes.length];
   const source = subject === 'math' || subject === 'pinyin' || subject === 'english'
     ? plan[subject]
@@ -931,8 +933,10 @@ function toLesson(plan: CoursePlan, weekday: Lesson['weekday'], subject: Subject
 
   return {
     id,
-    week: plan.week,
+    week: placement.week,
     weekday,
+    slot: placement.slot,
+    sourceWeek,
     subject,
     title,
     sceneId: scene.id,
@@ -966,8 +970,67 @@ function toLesson(plan: CoursePlan, weekday: Lesson['weekday'], subject: Subject
 }
 
 function buildLessons(): Lesson[] {
-  return coursePlans.flatMap((plan) =>
-    weekdaySubjects.map(({ weekday, subject }) => toLesson(plan, weekday, subject)));
+  function buildPinyinLesson(seed: typeof pinyinSessionSeeds[number]): Lesson {
+    const scene = scenes[(seed.sourceWeek - 1) % scenes.length];
+    const tasks = buildPinyinTasks(seed);
+    return {
+      id: seed.id,
+      week: seed.week,
+      weekday: seed.weekday,
+      slot: 1,
+      sourceWeek: seed.sourceWeek,
+      subject: 'pinyin',
+      title: seed.title,
+      sceneId: scene.id,
+      knowledgeIds: seed.knowledgeIds,
+      objectives: seed.objectives,
+      estimatedMinutes: 15,
+      segments: [
+        toSegment(seed.id, 'intro', '情境导入', seed.design.stages[0].teacherMove),
+        toSegment(seed.id, 'concept', '学一学', seed.design.stages[1].childAction),
+        toSegment(seed.id, 'practice', '练一练', '完成今天的发音、声调或书写小任务。', tasks.slice(0, 2)),
+        toSegment(seed.id, 'application', '长安任务', seed.design.stages[3].prompt, tasks.slice(2)),
+        toSegment(seed.id, 'summary', '我学会了', seed.design.stages[4].teacherMove),
+      ],
+      reviewIntervalDays: [1, 3, 7],
+      audit: {
+        subjectReviewedBy: 'pinyin-specialist',
+        teachingReviewedBy: 'early-education-teacher',
+        status: 'approved',
+      },
+      lessonDesign: getPinyinDesign(seed),
+    };
+  }
+
+  const secondLessons = Array.from({ length: 8 }, (_, index) => {
+    const week = index + 1;
+    const odd = index % 2 === 0;
+    const oddPlan = coursePlans[index * 2];
+    const evenPlan = coursePlans[index * 2 + 1];
+    const integratedPlan = coursePlans[index];
+    const placements: LessonPlacement[] = [
+      { week, weekday: 1, slot: 2, sourceWeek: oddPlan.week, subject: 'math' },
+      { week, weekday: 2, slot: 2, sourceWeek: oddPlan.week, subject: 'english' },
+      { week, weekday: 3, slot: 2, sourceWeek: evenPlan.week, subject: 'math' },
+      { week, weekday: 4, slot: 2, sourceWeek: evenPlan.week, subject: 'english' },
+      { week, weekday: 5, slot: 2, sourceWeek: integratedPlan.week, subject: odd ? 'creation' : 'review' },
+    ];
+    return placements.map((placement) => toLesson(
+      placement.subject === 'math' && placement.weekday === 3
+        ? evenPlan
+        : placement.subject === 'english' && placement.weekday === 4
+          ? evenPlan
+          : placement.weekday === 5
+            ? integratedPlan
+            : oddPlan,
+      placement,
+    ));
+  }).flat();
+
+  return [
+    ...secondLessons,
+    ...pinyinSessionSeeds.map(buildPinyinLesson),
+  ].sort((left, right) => left.week - right.week || left.weekday - right.weekday || left.slot - right.slot);
 }
 
 export const lessons: Lesson[] = buildLessons();

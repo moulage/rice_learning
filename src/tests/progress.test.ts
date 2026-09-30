@@ -13,6 +13,8 @@ const mathLesson: Lesson = {
   id: 'MATH-W01-L01',
   week: 1,
   weekday: 1,
+  slot: 1,
+  sourceWeek: 1,
   subject: 'math',
   title: '数学入学校验',
   sceneId: 'bell-tower',

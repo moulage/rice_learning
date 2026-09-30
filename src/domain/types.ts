@@ -40,10 +40,50 @@ export interface LessonSegment {
   tasks?: LessonTask[];
 }
 
+export type InteractionKind =
+  | 'listen'
+  | 'speak'
+  | 'choose'
+  | 'trace'
+  | 'gesture'
+  | 'mirror'
+  | 'game'
+  | 'review';
+
+export interface TeachingStage {
+  id: string;
+  phase: '导入' | '探究' | '示范' | '练习' | '辨错' | '小结';
+  title: string;
+  durationMinutes: number;
+  teacherMove: string;
+  childAction: string;
+  interaction: InteractionKind;
+  prompt: string;
+  successEvidence: string;
+  feedbackIfWrong: string;
+  resource?: string;
+}
+
+export interface LessonDesign {
+  curriculumBasis: string;
+  learnerProfile: string;
+  objectives: string[];
+  keyPoint: string;
+  difficultPoint: string;
+  preparation: string[];
+  stages: TeachingStage[];
+  boardSummary: string;
+  commonMistakes: string[];
+  homeTasks: string[];
+  reflectionQuestions: string[];
+}
+
 export interface Lesson {
   id: string;
   week: number;
   weekday: 1 | 2 | 3 | 4 | 5;
+  slot: 1 | 2;
+  sourceWeek: number;
   subject: Subject;
   title: string;
   sceneId: string;
@@ -57,6 +97,7 @@ export interface Lesson {
     teachingReviewedBy: string;
     status: AuditStatus;
   };
+  lessonDesign?: LessonDesign;
 }
 
 export interface KnowledgePoint {

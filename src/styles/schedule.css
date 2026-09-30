@@ -1,0 +1,134 @@
+.daily-tickets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.daily-ticket {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.95);
+  border: 1px solid rgba(216, 229, 223, 0.72);
+  box-shadow: var(--shadow-card);
+  animation: rise 0.45s ease both;
+}
+
+.daily-ticket .ticket-art {
+  min-height: 250px;
+  margin: 0;
+  border-radius: 0;
+}
+
+.daily-ticket .ticket-main {
+  display: flex;
+  flex-direction: column;
+  padding: 26px;
+}
+
+.daily-ticket .ticket-kicker span.completed {
+  background: var(--gold-soft);
+  color: var(--gold-deep);
+}
+
+.daily-ticket .ticket-title {
+  font-size: clamp(26px, 2.6vw, 38px);
+}
+
+.ticket-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.lesson-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.lesson-entry {
+  display: flex;
+  flex-direction: column;
+  min-height: 240px;
+  padding: 20px;
+  border-radius: 8px;
+  background: #fff;
+  border: 2px solid #dbe8e2;
+  box-shadow: 0 12px 28px rgba(29, 56, 51, 0.07);
+}
+
+.lesson-entry.locked {
+  background: #f3f6f5;
+  border-color: #d9e2df;
+  opacity: 0.78;
+}
+
+.lesson-entry.done { border-color: rgba(247, 193, 75, 0.72); }
+.entry-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.entry-weekday, .entry-subject {
+  color: var(--ink-soft);
+  font-size: 15px;
+  font-weight: 800;
+}
+.entry-status {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: 99px;
+  background: var(--teal-soft);
+  color: var(--teal-deep);
+  font-size: 14px;
+  font-weight: 850;
+}
+.entry-status.done { background: var(--gold-soft); color: var(--gold-deep); }
+.entry-status.locked { background: #e7ebea; color: #63746e; }
+.lesson-entry h3 {
+  min-height: 66px;
+  margin: 14px 0 8px;
+  font-size: 23px;
+  font-weight: 900;
+  line-height: 1.28;
+}
+.lesson-entry p {
+  flex: 1;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.lesson-entry footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+.lesson-entry footer span { color: var(--ink-soft); font-size: 16px; font-weight: 800; }
+.lesson-entry .primary-button, .lesson-entry .secondary-button {
+  min-width: 146px;
+  min-height: 56px;
+  font-size: 19px;
+}
+.lesson-entry .secondary-button svg { width: 21px; height: 21px; }
+
+@media (max-width: 1020px) {
+  .daily-tickets, .lesson-entry-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .daily-ticket { grid-template-columns: 1fr; }
+  .daily-ticket .ticket-art { min-height: 180px; }
+  .lesson-entry footer { align-items: stretch; flex-direction: column; }
+  .lesson-entry .primary-button, .lesson-entry .secondary-button { width: 100%; }
+}

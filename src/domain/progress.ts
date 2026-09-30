@@ -49,21 +49,21 @@ export function normalizeDailyProgress(progress: AppProgress, today = new Date()
   return { ...progress, todayCompletedLessons: 0 };
 }
 
-export function canStartLesson(progress: AppProgress, lesson: Lesson): boolean {
+export function canStartLesson(progress: AppProgress, _lesson?: Lesson): boolean {
   const normalized = normalizeDailyProgress(progress);
-  if (lesson.subject === 'review') {
-    return normalized.todayCompletedLessons < normalized.settings.dailyReviewLimit;
-  }
   return normalized.todayCompletedLessons < normalized.settings.dailyMainLessonLimit;
 }
 
+export const totalCurriculumWeeks = 8;
+
 export function getCurrentWeek(progress: AppProgress): number {
   const completed = progress.completedLessonIds.length;
-  return Math.min(16, Math.max(1, Math.floor(completed / 5) + 1));
+  return Math.min(totalCurriculumWeeks, Math.max(1, Math.floor(completed / 10) + 1));
 }
 
 export function startLesson(progress: AppProgress, lesson: Lesson): AppProgress {
-  if (!canStartLesson(progress, lesson)) return progress;
+  const isCompleted = progress.completedLessonIds.includes(lesson.id);
+  if (!isCompleted && !canStartLesson(progress, lesson)) return progress;
   return normalizeDailyProgress({
     ...progress,
     activeLessonId: lesson.id,

@@ -1,0 +1,28 @@
+.teaching-stage {
+  margin-top: 20px;
+  padding: 20px 24px;
+  border-radius: 8px;
+  background: var(--teal-soft);
+  border: 2px solid rgba(15, 118, 110, 0.16);
+}
+.stage-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--teal-deep);
+  font-size: 15px;
+  font-weight: 850;
+}
+.stage-meta strong { font-size: 18px; }
+.teaching-stage h4 { margin: 10px 0 6px; font-size: 26px; font-weight: 900; }
+.teaching-stage p { margin: 0; color: #33514b; font-size: 19px; line-height: 1.5; }
+.stage-evidence { margin-top: 10px !important; color: var(--teal-deep) !important; font-weight: 750; }
+.design-details { margin-top: 18px; padding: 14px 18px; border-radius: 8px; background: rgba(255,255,255,.72); }
+.design-details summary { cursor: pointer; color: var(--teal-deep); font-size: 18px; font-weight: 850; }
+.design-details ol { margin: 16px 0 0; padding-left: 24px; }
+.design-details li + li { margin-top: 14px; }
+.design-details strong { display: block; color: var(--ink); font-size: 18px; }
+.design-details span { color: var(--ink-soft); font-size: 14px; font-weight: 800; }
+.design-details p { margin: 4px 0 0; color: var(--ink-soft); font-size: 16px; line-height: 1.5; }
+.design-summary { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.design-summary p { margin: 6px 0 0; font-size: 16px; }

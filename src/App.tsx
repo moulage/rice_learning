@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getTodayLesson } from './domain/curriculum';
+import { getTodayLessons } from './domain/curriculum';
 import { useProgressStore } from './hooks/useProgressStore';
 import { HomePage } from './components/HomePage';
 import { LessonPlayer } from './components/LessonPlayer';
@@ -36,8 +36,9 @@ export default function App() {
   }
 
   const activeLesson = lessons.find((lesson) => lesson.id === progress.activeLessonId);
-  const lesson = activeLesson ?? getTodayLesson(progress, lessons);
-  const scene = scenes[Math.min(15, Math.max(0, lesson.week - 1))];
+  const todayLessons = getTodayLessons(progress, lessons);
+  const lesson = activeLesson ?? todayLessons[0];
+  const scene = scenes[Math.min(15, Math.max(0, lesson.sourceWeek - 1))];
   const knowledgeNames = Object.fromEntries(knowledgePoints.map((item) => [item.id, item.name]));
 
   function speak(text: string, language: string) {
@@ -84,8 +85,12 @@ export default function App() {
         <MapPage
           scenes={scenes}
           lessons={lessons}
-          completedLessonIds={progress.completedLessonIds}
+          progress={progress}
           onBack={() => setView('home')}
+          onEnterLesson={(nextLesson) => {
+            start(nextLesson);
+            setView('lesson');
+          }}
         />
       ) : view === 'works' ? (
         <WorksPage
@@ -108,11 +113,12 @@ export default function App() {
       ) : (
         <HomePage
           progress={progress}
-          lesson={lesson}
+          todayLessons={todayLessons}
+          scenes={scenes}
           scene={scene}
           onSpeak={speak}
-          onStart={() => {
-            start(lesson);
+          onStartLesson={(nextLesson) => {
+            start(nextLesson);
             setView('lesson');
           }}
           onOpenMap={() => setView('map')}

@@ -36,6 +36,7 @@ export function LessonPlayer({
   const language = lesson.subject === 'english' ? 'en-US' : 'zh-CN';
   const task = tasks[taskIndex];
   const isLastSegment = segmentIndex === lesson.segments.length - 1;
+  const designStage = lesson.lessonDesign?.stages[segmentIndex];
 
   useEffect(() => {
     setTaskIndex(0);
@@ -84,11 +85,11 @@ export function LessonPlayer({
 
   return (
     <div className="lesson-player">
-      <header className="lesson-header">
-        <button type="button" className="secondary-button" onClick={onExit}>回到地图</button>
+      <header className="lesson-topbar">
+        <button type="button" className="ghost-button" onClick={onExit}>回到地图</button>
         <div>
-          <p className="lesson-meta">第 {lesson.week} 周 · 第 {lesson.weekday} 天</p>
-          <h2>{lesson.title}</h2>
+          <p className="lesson-crumb">第 {lesson.week} 周 · 第 {lesson.weekday} 天 · {lesson.estimatedMinutes} 分钟</p>
+          <h1>{lesson.title}</h1>
         </div>
         <span className="completion">{completion}%</span>
       </header>
@@ -97,12 +98,47 @@ export function LessonPlayer({
         <div style={{ width: `${completion}%` }} />
       </div>
 
-      <section className="segment-panel">
+      <section className="lesson-stage">
         <div className="segment-head">
           <span className={`subject-badge ${lesson.subject}`}>{segment.title}</span>
           <SpeakButton text={segment.script} language={language} rate={progress.settings.speechRate} volume={progress.settings.volume} />
         </div>
         <p className="segment-script">{segment.script}</p>
+
+        {designStage && (
+          <div className="teaching-stage" aria-label="当前教学环节">
+            <div className="stage-meta">
+              <strong>{designStage.phase}</strong>
+              <span>{designStage.durationMinutes} 分钟</span>
+              <span>{designStage.interaction}</span>
+            </div>
+            <h4>{designStage.title}</h4>
+            <p>{designStage.childAction}</p>
+            <p className="stage-evidence">闯关证据：{designStage.successEvidence}</p>
+          </div>
+        )}
+
+        {lesson.lessonDesign && (
+          <details className="design-details">
+            <summary>看这节课的完整教学设计</summary>
+            <ol>
+              {lesson.lessonDesign.stages.map((stage) => (
+                <li key={stage.id}>
+                  <strong>{stage.phase} · {stage.title}</strong>
+                  <span>{stage.durationMinutes} 分钟</span>
+                  <p>{stage.teacherMove}</p>
+                  <p>孩子要做：{stage.childAction}</p>
+                </li>
+              ))}
+            </ol>
+            <div className="design-summary">
+              <p><strong>重点：</strong>{lesson.lessonDesign.keyPoint}</p>
+              <p><strong>难点：</strong>{lesson.lessonDesign.difficultPoint}</p>
+              <p><strong>板书口诀：</strong>{lesson.lessonDesign.boardSummary}</p>
+              <p><strong>课后任务：</strong>{lesson.lessonDesign.homeTasks.join('；')}</p>
+            </div>
+          </details>
+        )}
 
         {task ? (
           <TaskRenderer

@@ -7,15 +7,11 @@ export function weekdayOf(date: Date): 1 | 2 | 3 | 4 | 5 {
   return day as 1 | 2 | 3 | 4 | 5;
 }
 
-export function getLessonForWeekday(lessons: Lesson[], week: number, weekday: number): Lesson {
-  const found = lessons.find((lesson) => lesson.week === week && lesson.weekday === weekday);
-  if (!found) throw new Error(`Missing lesson for week ${week}, weekday ${weekday}`);
-  return found;
-}
-
-export function getTodayLesson(progress: AppProgress, lessons: Lesson[], today = new Date()): Lesson {
-  const week = Math.min(16, Math.max(1, Math.floor(progress.completedLessonIds.length / 5) + 1));
-  return getLessonForWeekday(lessons, week, weekdayOf(today));
+export function getTodayLessons(progress: AppProgress, lessons: Lesson[], today = new Date()): Lesson[] {
+  const week = Math.min(8, Math.max(1, Math.floor(progress.completedLessonIds.length / 10) + 1));
+  return lessons
+    .filter((lesson) => lesson.week === week && lesson.weekday === weekdayOf(today))
+    .sort((left, right) => left.slot - right.slot);
 }
 
 export function subjectProgress(progress: AppProgress, lessons: Lesson[], subject: Subject): number {

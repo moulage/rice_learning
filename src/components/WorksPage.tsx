@@ -28,8 +28,10 @@ export function WorksPage({ lessons, completedLessonIds, onBack }: WorksPageProp
             return (
               <article key={lesson.id} className="work-card">
                 <SceneArt sceneId={`scene-${sceneIndex}`} active />
-                <h2>{lesson.title}</h2>
-                <p>{lesson.objectives[0]}</p>
+                <div className="work-body">
+                  <h2>{lesson.title}</h2>
+                  <p>{lesson.objectives[0]}</p>
+                </div>
               </article>
             );
           })}

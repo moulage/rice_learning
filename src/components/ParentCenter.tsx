@@ -30,6 +30,7 @@ export function ParentCenter({
   const totalMinutes = progress.events.length * 1;
   const subjects: Array<'math' | 'pinyin' | 'english'> = ['math', 'pinyin', 'english'];
   const needReview = Object.values(progress.mastery).filter((item) => item.status === 'review-needed');
+  const masteredCount = Object.values(progress.mastery).filter((item) => item.status === 'mastered').length;
 
   function readFile(file: File) {
     const reader = new FileReader();
@@ -47,6 +48,25 @@ export function ParentCenter({
         <h1>家长中心</h1>
         <span>{progress.completedLessonIds.length} 节完成</span>
       </header>
+
+      <section className="stat-grid" aria-label="学习概览">
+        <article className="stat-card">
+          <strong>{progress.completedLessonIds.length}</strong>
+          <span>完成课节</span>
+        </article>
+        <article className="stat-card">
+          <strong>{masteredCount}</strong>
+          <span>已掌握知识点</span>
+        </article>
+        <article className="stat-card">
+          <strong>{needReview.length}</strong>
+          <span>待复习知识点</span>
+        </article>
+        <article className="stat-card">
+          <strong>{totalMinutes}</strong>
+          <span>累计任务数</span>
+        </article>
+      </section>
 
       <section className="parent-grid">
         <article className="parent-card">
@@ -77,7 +97,7 @@ export function ParentCenter({
         <article className="parent-card">
           <h2>学习设置</h2>
           <label>
-            每日主课上限
+            每日课程上限
             <input
               type="number"
               min={1}
