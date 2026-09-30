@@ -5,6 +5,7 @@ import './styles/global.css';
 import './styles/scenes.css';
 import './styles/schedule.css';
 import './styles/teaching.css';
+import './styles/voice.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

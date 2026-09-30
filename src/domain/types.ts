@@ -139,6 +139,7 @@ export interface ParentSettings {
   dailyReviewLimit: number;
   volume: number;
   speechRate: number;
+  voiceURI?: string;
   animationLevel: 'low' | 'normal';
   allowNextWeek: boolean;
 }

@@ -101,7 +101,13 @@ export function LessonPlayer({
       <section className="lesson-stage">
         <div className="segment-head">
           <span className={`subject-badge ${lesson.subject}`}>{segment.title}</span>
-          <SpeakButton text={segment.script} language={language} rate={progress.settings.speechRate} volume={progress.settings.volume} />
+          <SpeakButton
+            text={segment.script}
+            language={language}
+            rate={progress.settings.speechRate}
+            volume={progress.settings.volume}
+            voiceURI={progress.settings.voiceURI}
+          />
         </div>
         <p className="segment-script">{segment.script}</p>
 

@@ -1,22 +1,34 @@
 import { useCallback } from 'react';
+import { selectPreferredVoice, splitSpeechText } from '@/domain/speech';
+import { useSpeechVoice } from '@/hooks/useSpeechVoice';
 
 interface SpeakButtonProps {
   text: string;
   language: string;
   rate: number;
   volume: number;
+  voiceURI?: string;
+  pitch?: number;
 }
 
-export function SpeakButton({ text, language, rate, volume }: SpeakButtonProps) {
+export function SpeakButton({ text, language, rate, volume, voiceURI, pitch = 1.08 }: SpeakButtonProps) {
+  const { voice } = useSpeechVoice(language, voiceURI);
+
   const speak = useCallback(() => {
     if (typeof speechSynthesis === 'undefined') return;
+    const selectedVoice = voice ?? selectPreferredVoice(speechSynthesis.getVoices(), language, voiceURI);
     speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language;
-    utterance.rate = rate;
-    utterance.volume = volume;
-    speechSynthesis.speak(utterance);
-  }, [language, rate, text, volume]);
+
+    splitSpeechText(text).forEach((part) => {
+      const utterance = new SpeechSynthesisUtterance(part);
+      utterance.lang = selectedVoice?.lang ?? language;
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.rate = rate;
+      utterance.pitch = pitch;
+      utterance.volume = volume;
+      speechSynthesis.speak(utterance);
+    });
+  }, [language, pitch, rate, text, voice, voiceURI, volume]);
 
   return (
     <button type="button" className="icon-button" onClick={speak} aria-label={`朗读：${text}`}>

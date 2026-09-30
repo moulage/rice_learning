@@ -186,6 +186,7 @@ export function HomePage({
             language={lesson.subject === 'english' ? 'en-US' : 'zh-CN'}
             rate={progress.settings.speechRate}
             volume={progress.settings.volume}
+            voiceURI={progress.settings.voiceURI}
           />
         </div>
       </section>

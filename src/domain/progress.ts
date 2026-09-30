@@ -10,7 +10,8 @@ export const defaultParentSettings: ParentSettings = {
   dailyMainLessonLimit: 2,
   dailyReviewLimit: 1,
   volume: 0.7,
-  speechRate: 0.9,
+  speechRate: 0.82,
+  voiceURI: undefined,
   animationLevel: 'normal',
   allowNextWeek: true,
 };
@@ -127,7 +128,11 @@ export function importProgress(raw: string): AppProgress | null {
   try {
     const parsed = JSON.parse(raw) as AppProgress;
     if (parsed.version !== 1 || !Array.isArray(parsed.completedLessonIds)) return null;
-    return { ...createInitialProgress(), ...parsed };
+    const normalized = { ...createInitialProgress(), ...parsed };
+    if (normalized.settings.speechRate === 0.9) {
+      normalized.settings.speechRate = 0.82;
+    }
+    return normalized;
   } catch {
     return null;
   }

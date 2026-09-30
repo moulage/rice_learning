@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import type { AppProgress, Lesson } from '@/domain/types';
 import { subjectProgress } from '@/domain/curriculum';
+import { selectPreferredVoice, splitSpeechText } from '@/domain/speech';
+import { useSpeechVoice } from '@/hooks/useSpeechVoice';
 
 interface ParentCenterProps {
   progress: AppProgress;
@@ -30,6 +32,22 @@ export function ParentCenter({
   const totalMinutes = progress.events.length * 1;
   const subjects: Array<'math' | 'pinyin' | 'english'> = ['math', 'pinyin', 'english'];
   const needReview = Object.values(progress.mastery).filter((item) => item.status === 'review-needed');
+  const { voice, options } = useSpeechVoice('zh-CN', progress.settings.voiceURI);
+
+  function testTeacherVoice() {
+    if (typeof speechSynthesis === 'undefined') return;
+    const selected = voice ?? selectPreferredVoice(speechSynthesis.getVoices(), 'zh-CN', progress.settings.voiceURI);
+    speechSynthesis.cancel();
+    splitSpeechText('你好，小朋友。我们一起走进拼音王国，慢慢读，大胆说。').forEach((part) => {
+      const utterance = new SpeechSynthesisUtterance(part);
+      utterance.lang = selected?.lang ?? 'zh-CN';
+      if (selected) utterance.voice = selected;
+      utterance.rate = progress.settings.speechRate;
+      utterance.pitch = 1.08;
+      utterance.volume = progress.settings.volume;
+      speechSynthesis.speak(utterance);
+    });
+  }
   const masteredCount = Object.values(progress.mastery).filter((item) => item.status === 'mastered').length;
 
   function readFile(file: File) {
@@ -96,6 +114,22 @@ export function ParentCenter({
 
         <article className="parent-card">
           <h2>学习设置</h2>
+          <label>
+            老师声音
+            <select
+              value={progress.settings.voiceURI ?? ''}
+              onChange={(event) => onSettings({ voiceURI: event.target.value || undefined })}
+            >
+              <option value="">自动选择最适合儿童的声音</option>
+              {options.map((option) => (
+                <option key={option.uri} value={option.uri}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+          <div className="voice-status">当前推荐：{voice?.name ?? '正在读取系统声音'}</div>
+          <div className="task-actions start">
+            <button type="button" className="secondary-button" onClick={testTeacherVoice}>试听老师声音</button>
+          </div>
           <label>
             每日课程上限
             <input
